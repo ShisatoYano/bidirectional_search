@@ -67,9 +67,95 @@ void Graph::print_path(int *s_parent, int *t_parent, int s, int t, int intersect
         path.push_back(s_parent[i]);
         i = s_parent[i];
     }
+
+    reverse(path.begin(), path.end());
+    i = intersect_node;
+
+    while (i != t)
+    {
+        path.push_back(t_parent[i]);
+        i = t_parent[i];
+    }
+
+    vector<int>::iterator it;
+    cout << "*****Path*****\n";
+    for (it = path.begin(); it != path.end(); ++it) {
+        cout << *it << " ";
+    }
+    cout << "\n";
+}
+
+int Graph::bidir_search(int s, int t)
+{
+    bool s_visited[V], t_visited[V];
+
+    int s_parent[V], t_parent[V];
+
+    list<int> s_queue, t_queue;
+
+    int intersect_node = -1;
+
+    for (int i = 0; i < V; ++i) {
+        s_visited[i] = false;
+        t_visited[i] = false;
+    }
+
+    s_queue.push_back(s);
+    s_visited[s] = true;
+    s_parent[s] = -1;
+
+    t_queue.push_back(t);
+    t_visited[t] = true;
+    t_parent[t] = -1;
+
+    while (!s_queue.empty() && !t_queue.empty())
+    {
+        bfs(&s_queue, s_visited, s_parent);
+        bfs(&t_queue, t_visited, t_parent);
+
+        intersect_node = is_intersecting(s_visited, t_visited);
+
+        if (intersect_node != -1)
+        {
+            cout << "Path exist between " << s << " and " << t << "\n";
+            cout << "Intersection at: " << intersect_node << "\n";
+
+            print_path(s_parent, t_parent, s, t, intersect_node);
+            exit(0);
+        }
+    }
+
+    return -1;
 }
 
 int main() {
-    std::cout << "Hello, World!" << std::endl;
+    int n = 15;
+
+    int s = 0;
+
+    int t = 14;
+
+    Graph g(n);
+
+    g.add_edge(0, 4);
+    g.add_edge(1, 4);
+    g.add_edge(2, 5);
+    g.add_edge(3, 5);
+    g.add_edge(4, 6);
+    g.add_edge(5, 6);
+    g.add_edge(6, 7);
+    g.add_edge(7, 8);
+    g.add_edge(8, 9);
+    g.add_edge(8, 10);
+    g.add_edge(9, 11);
+    g.add_edge(9, 12);
+    g.add_edge(10, 13);
+    g.add_edge(10, 14);
+
+    if (g.bidir_search(s, t) == -1)
+    {
+        cout << "Path don't exist between " << s << " and " << t << "\n";
+    }
+
     return 0;
 }
